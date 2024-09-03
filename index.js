@@ -18,6 +18,22 @@ const server = http.createServer((req, res) => {
             }
         })
     }
+    if(url === '/message' && method === 'POST'){
+        const body = [];
+        req.on('data',(chunk) => {
+            body.push(chunk)
+        })
+
+        req.on('end',() => {
+            const message = Buffer.concat(body).toString();
+            fs.writeFile('./input.txt',message,() => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'text/plain');
+                res.write('Data sent successfully');
+                res.end();
+            })
+        })
+    }
 })
 
 server.listen(3000)
