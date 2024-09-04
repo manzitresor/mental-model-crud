@@ -6,7 +6,7 @@ const server = http.createServer((req, res) => {
     const method = req.method;
 
     if(url === '/' && method === 'GET') {
-        const readStream = fs.createReadStream('./input.txt','utf-8');
+        const readStream = fs.createReadStream('./input.txt',{ encoding: 'utf-8' });
 
         readStream.on('error',(error) => {
             res.statusCode = 404;
@@ -18,21 +18,31 @@ const server = http.createServer((req, res) => {
         res.statusCode =  200;
         readStream.pipe(res)
     }
-    if(url === '/message' && method === 'POST'){
-        const body = [];
+    
+    if(url === '/' && method === 'POST'){
+        const writeStream = fs.createWriteStream('./input.txt', { encoding: 'utf-8' });
+
         req.on('data',(chunk) => {
-            body.push(chunk)
+            writeStream.write(chunk)
         })
 
         req.on('end',() => {
-            const message = Buffer.concat(body).toString();
-            fs.writeFile('./input.txt',message,() => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'text/plain');
-                res.write('Data sent successfully');
-                res.end();
+                writeStream.end()
+
+                    writeStream.on('finish',()=> {
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'text/plain');
+                        res.write('Data sent successfully');
+                        res.end();
+                    })
+
+                    writeStream.on('error',()=> {
+                        res.statusCode = 404;
+                        res.setHeader('Content-Type', 'text/plain');
+                        res.write('Failed to send Data');
+                        res.end();
+                    })
             })
-        })
     }
 })
 
