@@ -11,22 +11,6 @@ const server = http.createServer((req, res) => {
     const url = req.url;
     const method = req.method;
 
-    /**
-     * @swagger
-     * /:
-     *  get:
-     *     summary: Get content of input.txt file
-     *     response:
-     *      200:
-     *          description: Returns the contents of the file
-     *          content:
-     *              text/plain:
-     *                  schema:
-     *                      type: string
-     *      400: 
-     *          description: File not Found
-     */
-
     if(url === '/' && method === 'GET') {
         const readStream = fs.createReadStream('./input.txt',{ encoding: 'utf-8' });
 
@@ -40,24 +24,6 @@ const server = http.createServer((req, res) => {
         res.statusCode =  200;
         readStream.pipe(res)
     }
-    
-    /**
-   * @swagger
-   * /:
-   *   post:
-   *     summary: Write data to input.txt file
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         text/plain:
-   *           schema:
-   *             type: string
-   *     responses:
-   *       200:
-   *         description: Data sent successfully
-   *       404:
-   *         description: Failed to send data
-   */
 
     if(url === '/' && method === 'POST'){
         const writeStream = fs.createWriteStream('./input.txt', { encoding: 'utf-8' });
